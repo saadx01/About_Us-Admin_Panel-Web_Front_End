@@ -53,12 +53,14 @@ export const SideNav = (props) => {
             }}
           >
             {/* <Logo /> */}
-            {/* <img src="../../public/about-us-logo.png" alt="logo" /> */}
             {/* <img
               src={require("../../../public/about-us-logo.png")}
               alt='About Us Logo'
-              // className='logo'
             /> */}
+            <img
+              src="/about-us-logo.png"
+              alt="About Us Logo"
+            />
           </Box>
           <Box
             sx={{
