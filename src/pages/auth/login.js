@@ -22,11 +22,11 @@ import { Layout as AuthLayout } from 'src/layouts/auth/layout';
 const Page = () => {
   const router = useRouter();
   const auth = useAuth();
-  const [method, setMethod] = useState('email');
+  // const [method, setMethod] = useState('email');
   const formik = useFormik({
     initialValues: {
-      email: 'saad123@gmail.com',
-      password: 'Password123!',
+      email: 'admin@gmail.com',
+      password: 'admin',
       submit: null
     },
     validationSchema: Yup.object({
@@ -52,20 +52,20 @@ const Page = () => {
     }
   });
 
-  const handleMethodChange = useCallback(
-    (event, value) => {
-      setMethod(value);
-    },
-    []
-  );
+  // const handleMethodChange = useCallback(
+  //   (event, value) => {
+  //     setMethod(value);
+  //   },
+  //   []
+  // );
 
-  const handleSkip = useCallback(
-    () => {
-      auth.skip();
-      router.push('/');
-    },
-    [auth, router]
-  );
+  // const handleSkip = useCallback(
+  //   () => {
+  //     auth.skip();
+  //     router.push('/');
+  //   },
+  //   [auth, router]
+  // );
 
   return (
     <>
@@ -129,7 +129,7 @@ const Page = () => {
                 value="phoneNumber"
               />
             </Tabs> */}
-            {method === 'email' && (
+            {/* {method === 'email' && ( */}
               <form
                 noValidate
                 onSubmit={formik.handleSubmit}
@@ -192,25 +192,8 @@ const Page = () => {
                   severity="info"
                   sx={{ mt: 3 }}
                 >
-                  <div>
-                    You can use <b>demo@devias.io</b> and password <b>Password123!</b>
-                  </div>
                 </Alert> */}
               </form>
-            )}
-            {/* {method === 'phoneNumber' && (
-              <div>
-                <Typography
-                  sx={{ mb: 1 }}
-                  variant="h6"
-                >
-                  Not available in the demo
-                </Typography>
-                <Typography color="text.secondary">
-                  To prevent unnecessary costs we disabled this feature in the demo.
-                </Typography>
-              </div>
-            )} */}
           </div>
         </Box>
       </Box>
