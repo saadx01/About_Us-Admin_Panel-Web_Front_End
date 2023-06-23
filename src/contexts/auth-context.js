@@ -1,17 +1,17 @@
-import { createContext, useContext, useEffect, useReducer, useRef } from 'react';
-import PropTypes from 'prop-types';
-import axios from 'axios';
+import { createContext, useContext, useEffect, useReducer, useRef, useState } from "react";
+import PropTypes from "prop-types";
+import axios from "axios";
 
 const HANDLERS = {
-  INITIALIZE: 'INITIALIZE',
-  SIGN_IN: 'SIGN_IN',
-  SIGN_OUT: 'SIGN_OUT'
+  INITIALIZE: "INITIALIZE",
+  SIGN_IN: "SIGN_IN",
+  SIGN_OUT: "SIGN_OUT",
 };
 
 const initialState = {
-  isAuthenticated: false,
+  isAuthenticated: true,
   isLoading: true,
-  user: null
+  user: null,
 };
 
 const handlers = {
@@ -20,18 +20,16 @@ const handlers = {
 
     return {
       ...state,
-      ...(
-        // if payload (user) is provided, then is authenticated
-        user
-          ? ({
+      ...// if payload (user) is provided, then is authenticated
+      (user
+        ? {
             isAuthenticated: true,
             isLoading: false,
-            user
-          })
-          : ({
-            isLoading: false
-          })
-      )
+            user,
+          }
+        : {
+            isLoading: false,
+          }),
     };
   },
   [HANDLERS.SIGN_IN]: (state, action) => {
@@ -40,21 +38,20 @@ const handlers = {
     return {
       ...state,
       isAuthenticated: true,
-      user
+      user,
     };
   },
   [HANDLERS.SIGN_OUT]: (state) => {
     return {
       ...state,
       isAuthenticated: false,
-      user: null
+      user: null,
     };
-  }
+  },
 };
 
-const reducer = (state, action) => (
-  handlers[action.type] ? handlers[action.type](state, action) : state
-);
+const reducer = (state, action) =>
+  handlers[action.type] ? handlers[action.type](state, action) : state;
 
 // The role of this context is to propagate authentication state through the App tree.
 
@@ -64,6 +61,7 @@ export const AuthProvider = (props) => {
   const { children } = props;
   const [state, dispatch] = useReducer(reducer, initialState);
   const initialized = useRef(false);
+  const [user, setUser] = useState(null);
 
   const initialize = async () => {
     // Prevent from calling twice in development mode with React.StrictMode enabled
@@ -76,29 +74,41 @@ export const AuthProvider = (props) => {
     let isAuthenticated = false;
 
     try {
-      isAuthenticated = window.sessionStorage.getItem('authenticated') === 'true';
+      isAuthenticated = window.sessionStorage.getItem("user_login") === "true";
     } catch (err) {
       console.error(err);
     }
 
     if (isAuthenticated) {
-      const user = {
-        id: '5e86809283e28b96d2d38537',
-        avatar: '/assets/avatars/avatar-anika-visser.png',
-        name: 'Anika Visser',
-        email: 'anika.visser@devias.io'
-      };
-
       dispatch({
         type: HANDLERS.INITIALIZE,
-        payload: user
+        payload: user,
       });
     } else {
       dispatch({
-        type: HANDLERS.INITIALIZE
+        type: HANDLERS.INITIALIZE,
       });
     }
   };
+
+  // get item for local storage
+  const getItem = (user_login) => {
+    try {
+      const data_user = window.localStorage.getItem("user_login");
+      console.log("getItem: ", data_user);
+      // set local storage to state
+      setUser(data_user);
+      return window.localStorage.getItem("user_login");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    console.log("useEffect inside AuthContext");
+    console.log("user inside AuthContext:", state.user);
+    getItem();
+  }, []);
 
   useEffect(
     () => {
@@ -152,79 +162,72 @@ export const AuthProvider = (props) => {
   //   });
   // };
 
+  const signIn = async (email, password) => {
+    try {
+      const data = JSON.stringify({
+        email,
+        password,
+      });
 
+      const config = {
+        method: "post",
+        maxBodyLength: Infinity,
+        url: "http://localhost:4000/api/v1/users/login",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: data,
+      };
 
+      const response = await axios.request(config);
 
+      // console.log(response.data)
+      const { user } = response.data.data;
+      // console.log(user)
 
-const signIn = async (email, password) => {
-  try {
-    const data = JSON.stringify({
-      email,
-      password
-    });
+      window.sessionStorage.setItem("authenticated", response.data.data);
 
-    const config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url: 'http://localhost:4000/api/v1/users/login',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      data: data
-    };
+      dispatch({
+        type: HANDLERS.SIGN_IN,
+        payload: user,
+      });
+    } catch (err) {
+      console.error(err);
+      throw new Error("An error occurred during sign-in. Please check your email and password");
+      // throw new Error('Please check your email and password');
+    }
+  };
 
-    const response = await axios.request(config);
+  // const signOut = async () => {
+  //   try {
+  //     const config = {
+  //       method: 'post',
+  //       maxBodyLength: Infinity,
+  //       url: 'http://localhost:4000/api/v1/users/logout', // Replace with your backend logout endpoint
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Cookie': 'jwt=...' // Replace with the appropriate cookie value
+  //       }
+  //     };
 
-    // console.log(response.data)
-    const { user } = response.data.data;
-    // console.log(user)
+  //     await axios.request(config);
 
-    
-    window.sessionStorage.setItem('authenticated', response.data.data);
-
-
-    dispatch({
-      type: HANDLERS.SIGN_IN,
-      payload: user
-    });
-  } catch (err) {
-    console.error(err);
-    throw new Error('An error occurred during sign-in. Please check your email and password');
-    // throw new Error('Please check your email and password');
-  }
-};
-
-// const signOut = async () => {
-//   try {
-//     const config = {
-//       method: 'post',
-//       maxBodyLength: Infinity,
-//       url: 'http://localhost:4000/api/v1/users/logout', // Replace with your backend logout endpoint
-//       headers: {
-//         'Content-Type': 'application/json',
-//         'Cookie': 'jwt=...' // Replace with the appropriate cookie value
-//       }
-//     };
-
-//     await axios.request(config);
-
-//     dispatch({
-//       type: HANDLERS.SIGN_OUT
-//     });
-//   } catch (err) {
-//     console.error(err);
-//     throw new Error('An error occurred during sign-out');
-//   }
-// };
-
+  //     dispatch({
+  //       type: HANDLERS.SIGN_OUT
+  //     });
+  //   } catch (err) {
+  //     console.error(err);
+  //     throw new Error('An error occurred during sign-out');
+  //   }
+  // };
 
   const signUp = async (email, name, password) => {
-    throw new Error('Sign up is not implemented');
+    throw new Error("Sign up is not implemented");
   };
 
   const signOut = () => {
     dispatch({
-      type: HANDLERS.SIGN_OUT
+      type: HANDLERS.SIGN_OUT,
     });
   };
 
@@ -235,7 +238,7 @@ const signIn = async (email, password) => {
         // skip,
         signIn,
         signUp,
-        signOut
+        signOut,
       }}
     >
       {children}
@@ -244,24 +247,12 @@ const signIn = async (email, password) => {
 };
 
 AuthProvider.propTypes = {
-  children: PropTypes.node
+  children: PropTypes.node,
 };
 
 export const AuthConsumer = AuthContext.Consumer;
 
 export const useAuthContext = () => useContext(AuthContext);
-
-
-
-
-
-
-
-
-
-
-
-
 
 // import { createContext, useContext, useEffect, useReducer, useRef } from 'react';
 // import PropTypes from 'prop-types';
