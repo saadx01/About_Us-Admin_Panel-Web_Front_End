@@ -74,18 +74,18 @@ export const SocialWorkerTable = (props) => {
                 <TableCell>
                   Name
                 </TableCell>
-                <TableCell>
+                {/* <TableCell>
                   Email
-                </TableCell>
+                </TableCell> */}
                 <TableCell>
                   Location
                 </TableCell>
                 <TableCell>
                   Phone
                 </TableCell>
-                <TableCell>
+                {/* <TableCell>
                   Signed Up
-                </TableCell>
+                </TableCell> */}
                 <TableCell>
                   {
                     method === "active" ? "Remove" : "Readd"
@@ -96,12 +96,12 @@ export const SocialWorkerTable = (props) => {
             <TableBody>
               {filteredItems.map((customer) => {
                 const isSelected = selected.includes(customer.id);
-                const createdAt = format(customer.createdAt, 'dd/MM/yyyy');
+                // const createdAt = format(customer.createdAt, 'dd/MM/yyyy');
 
                 return (
                   <TableRow
                     hover
-                    key={customer.id}
+                    key={customer._id}
                     selected={isSelected}
                   >
                     {/* <TableCell padding="checkbox">
@@ -130,18 +130,20 @@ export const SocialWorkerTable = (props) => {
                         </Typography>
                       </Stack>
                     </TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                       {customer.email}
+                    </TableCell> */}
+                    <TableCell>
+                      {/* {customer.address.city}, {customer.address.state}, {customer.address.country} */}
+                      {customer.city}
                     </TableCell>
                     <TableCell>
-                      {customer.address.city}, {customer.address.state}, {customer.address.country}
+                      {/* {customer.phone} */}
+                      {customer.mobileNumber}
                     </TableCell>
-                    <TableCell>
-                      {customer.phone}
-                    </TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                       {createdAt}
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell>
                       <Button>
                       {

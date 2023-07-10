@@ -23,6 +23,9 @@ import TrashIcon from '@heroicons/react/24/solid/TrashIcon';
 import XMarkIcon from '@heroicons/react/24/solid/XMarkIcon';
 import EnvelopeIcon from '@heroicons/react/24/solid/EnvelopeIcon';
 import DocumentIcon from '@heroicons/react/24/solid/DocumentIcon';
+import React from 'react';
+import ViewRequestForm from "./view-request-form";
+import { API_URL } from "../../../config/constants";
 
 
 export const RequestsTable = (props) => {
@@ -38,9 +41,87 @@ export const RequestsTable = (props) => {
     page = 0,
     rowsPerPage = 0,
     selected = [],
-    method
+    method,
+    rowsUpdate,
+    setRowsUpdate
   } = props;
-  // console.log("Method: ",method)
+
+
+  const handleApproveRequest = async (selectedNgoRequestId) => {
+    // console.log("ID got in func: ", selectedNgoRequestId);
+    const axios = require('axios');
+    const token = window.localStorage.getItem('token');
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: `${API_URL}ngos/approve-ngo/${selectedNgoRequestId}`,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    };
+  
+    try {
+      const response = await axios.request(config);
+      console.log(JSON.stringify(response.data));
+      setRowsUpdate(!rowsUpdate);
+      // console.log("RowsUpdate changed to: ", rowsUpdate);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  
+
+  const handleRejectRequest = async (selectedNgoRequestId) => {
+    console.log("ID got in func: ", selectedNgoRequestId);
+    const axios = require('axios');
+    const token = window.localStorage.getItem('token');
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: `${API_URL}ngos/reject-ngo/${selectedNgoRequestId}`,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    };
+  
+    try {
+      const response = await axios.request(config);
+      console.log(JSON.stringify(response.data));
+      setRowsUpdate(!rowsUpdate);
+      // console.log("RowsUpdate changed to: ", rowsUpdate);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  const handleDeleteRequest = async (selectedNgoRequestId) => {
+    // console.log("ID got in func: ", selectedNgoRequestId);
+    const axios = require('axios');
+    const token = window.localStorage.getItem('token');
+    let config = {
+      method: 'delete',
+      maxBodyLength: Infinity,
+      url: `${API_URL}ngos/delete-ngo/${selectedNgoRequestId}`,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    };
+  
+    try {
+      const response = await axios.request(config);
+      // console.log(JSON.stringify(response.data));
+      setRowsUpdate(!rowsUpdate);
+      // console.log("RowsUpdate changed to: ", rowsUpdate);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+
+
+
 
   const selectedSome = (selected.length > 0) && (selected.length < items.length);
   const selectedAll = (items.length > 0) && (selected.length === items.length);
@@ -53,27 +134,28 @@ export const RequestsTable = (props) => {
   // console.log("filteredItems: ",filteredItems)
 
   const showSelectiveApproveHeader = () => {
-    if(method === 'new' || method === 'rejected')
+    if(method === 'pending' || method === 'rejected')
       return <TableCell>
         Approve
       </TableCell>
   }
   const showSelectiveRejectedHeader = () => {
-    if(method === 'new')
+    if(method === 'pending')
       return <TableCell>
         Reject
       </TableCell>
-    else if(method === 'rejected' || method === 'approved')
+    else if(method === 'rejected' || method === 'active')
       return <TableCell>
         Delete
       </TableCell>
   }
 
-  const showSelectiveCheckIcon = () => {
+  const showSelectiveCheckIcon = (selectedNgoRequestId) => {
     // console.log("Inside func")
-    if (method === 'new' || method === 'rejected')
+    if (method === 'pending' || method === 'rejected')
       return <TableCell>
-        <Button>
+        <Button
+        onClick={() => handleApproveRequest(selectedNgoRequestId)}>
           <SvgIcon
             color="action"
             fontSize="medium"
@@ -84,10 +166,11 @@ export const RequestsTable = (props) => {
       </TableCell>
   }
 
-  const showSelectiveRejectDeleteIcon = () => {
-    if (method === 'new')
+  const showSelectiveRejectDeleteIcon = (selectedNgoRequestId) => {
+    if (method === 'pending')
       return <TableCell>
-        <Button>
+        <Button
+        onClick={() => handleRejectRequest(selectedNgoRequestId)}>
           <SvgIcon
             color="action"
             fontSize="medium"
@@ -98,7 +181,8 @@ export const RequestsTable = (props) => {
       </TableCell>
     else
       return <TableCell>
-      <Button>
+      <Button
+      onClick={() => handleDeleteRequest(selectedNgoRequestId)}>
         <SvgIcon
           color="action"
           fontSize="medium"
@@ -109,97 +193,77 @@ export const RequestsTable = (props) => {
     </TableCell>
   }
 
+  const [selectedNgoRequest, setSelectedNgoRequest] = React.useState("");
+  const [openViewRequest, setOpenViewRequest] = React.useState(false);
+
+  const handleShowRequest = (event, ngoRequest) => {
+    setSelectedNgoRequest(ngoRequest);
+    setOpenViewRequest(true);
+    // console.log("userID is: ",userId);
+  };
+
+  const handleCloseViewRequest = () => {
+    setOpenViewRequest(false);
+    // setSelectedNgoRequest(null)
+  };
+
   return (
+    <>
     <Card>
       <Scrollbar>
         <Box sx={{ minWidth: 800 }}>
           <Table>
             <TableHead>
               <TableRow>
-                {/* <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedAll}
-                    indeterminate={selectedSome}
-                    onChange={(event) => {
-                      if (event.target.checked) {
-                        onSelectAll?.();
-                      } else {
-                        onDeselectAll?.();
-                      }
-                    }}
-                  />
-                </TableCell> */}
                 <TableCell>
                   NGO
                 </TableCell>
                 <TableCell>
                   View Request Form
                 </TableCell>
-                <TableCell>
+                {/* <TableCell>
                   Mail NGO
-                </TableCell>
+                </TableCell> */}
                 {showSelectiveApproveHeader()}
                 {showSelectiveRejectedHeader()}
-                {/* <TableCell>
-                  {
-                    method === "new" ? "Approve" : "Delete"
-                  }  
-                </TableCell> */}
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredItems.map((complaint) => {
-                const isSelected = selected.includes(complaint.id);
-                const createdAt = format(complaint.createdAt, 'dd/MM/yyyy');
+              {/* {console.log("Filtered Items", filteredItems)} */}
+              {filteredItems.map((ngoRequest) => {
+                const isSelected = selected.includes(ngoRequest.id);
+                const createdAt = format(new Date(ngoRequest.createdAt), 'dd/MM/yyyy');
+                // console.log("NGO: ", ngoRequest)
 
                 return (
                   <TableRow
                     hover
-                    key={complaint.id}
+                    key={ngoRequest._id}
                     selected={isSelected}
-                    // onClick ={
-                    //   () => {
-                    //     console.log(complaint.id, " Row clicked.")
-                    //   }
-                    // }
                   >
-                    {/* <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={isSelected}
-                        onChange={(event) => {
-                          if (event.target.checked) {
-                            onSelectOne?.(complaint.id);
-                          } else {
-                            onDeselectOne?.(complaint.id);
-                          }
-                        }}
-                      />
-                    </TableCell> */}
                     <TableCell>
-                      {/* <Stack
-                        alignItems="center"
-                        direction="row"
-                        spacing={2}
-                      > */}
-                        {/* <Avatar src={complaint.avatar}>
-                          {getInitials(complaint.name)}
+                        {/* <Avatar src={ngoRequest.avatar}>
+                          {getInitials(ngoRequest.name)}
                         </Avatar> */}
                         <Typography variant="subtitle2">
-                          {complaint.name}
+                          {ngoRequest.name}
                         </Typography>
                       {/* </Stack> */}
                     </TableCell>
                     <TableCell>
-                      <Button>
-                      <SvgIcon
-                          color="action"
-                          fontSize="medium"
+                      <Button
+                      onClick={(event) =>
+                        handleShowRequest(event, ngoRequest)
+                      }>
+                        <SvgIcon
+                            color="action"
+                            fontSize="medium"
                         >
                           <DocumentIcon />
                         </SvgIcon>
                       </Button>
                     </TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                       <Button>
                       <SvgIcon
                           color="action"
@@ -208,9 +272,9 @@ export const RequestsTable = (props) => {
                           <EnvelopeIcon />
                         </SvgIcon>
                       </Button>
-                    </TableCell>
-                    {showSelectiveCheckIcon()}
-                    {showSelectiveRejectDeleteIcon()}
+                    </TableCell> */}
+                    {showSelectiveCheckIcon(ngoRequest._id)}
+                    {showSelectiveRejectDeleteIcon(ngoRequest._id)}
                   </TableRow>
                 );
               })}
@@ -228,6 +292,17 @@ export const RequestsTable = (props) => {
         rowsPerPageOptions={[5, 10, 25]}
       />
     </Card>
+
+    {openViewRequest && (
+      <ViewRequestForm
+        openViewRequest={openViewRequest}
+        handleCloseViewRequest={handleCloseViewRequest}
+        selectedNgoRequest={selectedNgoRequest}
+        // handleRowsUpdate={handleRowsUpdate}
+      />
+    )}
+    </>
+    
   );
 };
 

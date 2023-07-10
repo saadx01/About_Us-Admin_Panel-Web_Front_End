@@ -13,9 +13,6 @@ import { OverviewTraffic } from 'src/sections/overview/overview-traffic';
 
 const now = new Date();
 
-// const temp = sessionStorage.getItem('authenticated');
-// console.log(temp)
-
 const Page = () => (
   <>
     <Head>
@@ -23,7 +20,6 @@ const Page = () => (
         Overview | About Us
       </title>
     </Head>
-    {/* <h1>This is session storage: {temp}</h1> */}
     <Box
       component="main"
       sx={{
