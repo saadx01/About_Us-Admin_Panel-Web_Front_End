@@ -27,7 +27,8 @@ import { API_URL } from "../../../config/constants";
 export const SocialWorkerTable = (props) => {
   const {
     count = 0,
-    items = [],
+    // items = [],
+    filteredItems = [],
     onDeselectAll,
     onDeselectOne,
     onPageChange = () => {},
@@ -45,11 +46,11 @@ export const SocialWorkerTable = (props) => {
   // const selectedSome = (selected.length > 0) && (selected.length < items.length);
   // const selectedAll = (items.length > 0) && (selected.length === items.length);
   
-  const filterItems = (items) => {
-      return items.filter((item) => item.status === method)
-  };
+  // const filterItems = (items) => {
+  //     return items.filter((item) => item.status === method)
+  // };
 
-  const filteredItems = filterItems(items);
+  // const filteredItems = filterItems(items);
 
 
   const handleRemoveWorker = async (selectedWorkerId) => {

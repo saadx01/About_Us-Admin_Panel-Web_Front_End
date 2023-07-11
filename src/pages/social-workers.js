@@ -45,9 +45,16 @@ const Page = () => {
     getSocialWorkers();
   }, [rowsUpdate]);
 
-  const useCustomers = useMemo(() => {
-    return applyPagination(data, page, rowsPerPage);
-  }, [data, page, rowsPerPage]);
+  const filterData = (data) => {
+    return data.filter((data) => data.status === method)
+  };
+
+  const filteredData = filterData(data);
+  console.log("Filtered Data: ", filteredData)
+
+  const useData = useMemo(() => {
+    return applyPagination(filteredData, page, rowsPerPage);
+  }, [filteredData, page, rowsPerPage]);
 
   const customersIds = useMemo(() => {
     return data.map((customer) => customer.id);
@@ -65,7 +72,9 @@ const Page = () => {
 
   const handleMethodChange = useCallback((event, value) => {
     setMethod(value);
+    setPage(0);
   }, []);
+
 
   return (
     <>
@@ -88,8 +97,9 @@ const Page = () => {
             </Tabs>
 
             <SocialWorkerTable
-              count={data.length}
-              items={useCustomers}
+              count={filteredData.length}
+              // items={useData}
+              filteredItems={useData}
               onDeselectAll={customersSelection.handleDeselectAll}
               onDeselectOne={customersSelection.handleDeselectOne}
               onPageChange={handlePageChange}
@@ -288,7 +298,7 @@ export default Page;
 //   }
 // ];
 
-// const useCustomers = (page, rowsPerPage) => {
+// const useData = (page, rowsPerPage) => {
 //   return useMemo(
 //     () => {
 //         return applyPagination(data, page, rowsPerPage);
@@ -309,7 +319,7 @@ export default Page;
 // const Page = () => {
 //   const [page, setPage] = useState(0);
 //   const [rowsPerPage, setRowsPerPage] = useState(5);
-//   const customers = useCustomers(page, rowsPerPage);
+//   const customers = useData(page, rowsPerPage);
 //   const customersIds = useCustomerIds(customers);
 //   const customersSelection = useSelection(customersIds);
 
