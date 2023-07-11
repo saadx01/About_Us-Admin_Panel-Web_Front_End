@@ -22,6 +22,9 @@ import CheckIcon from '@heroicons/react/24/solid/CheckIcon';
 import TrashIcon from '@heroicons/react/24/solid/TrashIcon';
 import EnvelopeIcon from '@heroicons/react/24/solid/EnvelopeIcon';
 import ChatBubbleBottomCenterTextIcon from '@heroicons/react/24/solid/ChatBubbleBottomCenterTextIcon';
+import ViewComplaint from "./view-complaint";
+import React from 'react';
+import { API_URL } from "../../../config/constants";
 
 
 export const ComplaintsTable = (props) => {
@@ -37,21 +40,64 @@ export const ComplaintsTable = (props) => {
     page = 0,
     rowsPerPage = 0,
     selected = [],
-    method
+    method,
+    rowsUpdate,
+    setRowsUpdate
   } = props;
-  // console.log("Method: ",method)
+  // console.log("Items: ",items);
+  console.log("Method: ",method);
 
-  const selectedSome = (selected.length > 0) && (selected.length < items.length);
-  const selectedAll = (items.length > 0) && (selected.length === items.length);
+  // const selectedSome = (selected.length > 0) && (selected.length < items.length);
+  // const selectedAll = (items.length > 0) && (selected.length === items.length);
   
-  const filterItems = (items) => (items.filter((item) => item.status === method))
-
+  const filterItems = (items) => (items.filter((item) => item.resolved === method))
 
   const filteredItems = filterItems(items)
+
   // console.log("Items: ",items)
-  // console.log("filteredItems: ",filteredItems)
+  console.log("filteredItems: ",filteredItems)
+
+  const [selectedComplaint, setSelectedComplaint] = React.useState("");
+  const [openViewComplaint, setOpenViewComplaint] = React.useState(false);
+
+  const handleViewComplaint = (event, complaint) => {
+    setSelectedComplaint(complaint);
+    setOpenViewComplaint(true);
+    // console.log("userID is: ",userId);
+  };
+
+  const handleCloseViewComplaint = () => {
+    setOpenViewComplaint(false);
+    // setSelectedNgoRequest(null)
+  };
+
+
+  const handleReadComplaint = async (selectedComplaintId) => {
+    // console.log("ID got in func: ", selectedComplaintId);
+    const axios = require('axios');
+    const token = window.localStorage.getItem('token');
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: `${API_URL}projects/resolve-complain/${selectedComplaintId}`,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    };
+  
+    try {
+      const response = await axios.request(config);
+      console.log(JSON.stringify(response.data));
+      setRowsUpdate(!rowsUpdate);
+      // console.log("RowsUpdate changed to: ", rowsUpdate);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
 
   return (
+    <>
     <Card>
       <Scrollbar>
         <Box sx={{ minWidth: 800 }}>
@@ -84,46 +130,35 @@ export const ComplaintsTable = (props) => {
                   Date
                 </TableCell>
                 <TableCell>
-                  View Complain
+                  View Complaint
                 </TableCell>
                 <TableCell>
                   Mail NGO
                 </TableCell>
-                <TableCell>
-                  {
-                    method === "new" ? "Mark Read" : "Delete"
-                  }  
-                </TableCell>
+                {method === false ? 
+                  <TableCell>
+                    Mark Read
+                  </TableCell>
+                :
+                null
+                }  
+                
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredItems.map((complaint) => {
-                const isSelected = selected.includes(complaint.id);
-                const createdAt = format(complaint.createdAt, 'dd/MM/yyyy');
+                // const isSelected = selected.includes(complaint.id);
+                const createdAt = format(new Date(complaint.createdAt), 'dd/MM/yyyy');
+
+                // const createdAt = format(new Date(ngoRequest.createdAt), 'dd/MM/yyyy');
+
 
                 return (
                   <TableRow
                     hover
-                    key={complaint.id}
-                    selected={isSelected}
-                    // onClick ={
-                    //   () => {
-                    //     console.log(complaint.id, " Row clicked.")
-                    //   }
-                    // }
+                    key={complaint._id}
                   >
-                    {/* <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={isSelected}
-                        onChange={(event) => {
-                          if (event.target.checked) {
-                            onSelectOne?.(complaint.id);
-                          } else {
-                            onDeselectOne?.(complaint.id);
-                          }
-                        }}
-                      />
-                    </TableCell> */}
+
                     <TableCell>
                       {/* <Stack
                         alignItems="center"
@@ -134,21 +169,24 @@ export const ComplaintsTable = (props) => {
                           {getInitials(complaint.name)}
                         </Avatar> */}
                         <Typography variant="subtitle2">
-                          {complaint.name}
+                          {/* {complaint.project.name} */}
                         </Typography>
                       {/* </Stack> */}
                     </TableCell>
                     <TableCell>
-                      {complaint.email}
+                      {/* {complaint.project.ngo.name} */}
                     </TableCell>
                     <TableCell>
-                      {complaint.address.city}, {complaint.address.state}, {complaint.address.country}
+                      {complaint.socialWorker.name}
                     </TableCell>
                     <TableCell>
                       {createdAt}
                     </TableCell>
                     <TableCell>
-                      <Button>
+                      <Button
+                      onClick={(event) =>
+                        handleViewComplaint(event, complaint)
+                      }>
                       <SvgIcon
                           color="action"
                           fontSize="medium"
@@ -168,21 +206,26 @@ export const ComplaintsTable = (props) => {
                       </Button>
                     </TableCell>
                     <TableCell>
-                      <Button>
+                      <Button
+                      onClick={() =>
+                        handleReadComplaint(complaint._id)
+                      }>
                       {
-                        method === "new" ? 
+                        method === false ? 
                         <SvgIcon
                           color="action"
                           fontSize="medium"
                         >
                           <CheckIcon />
-                        </SvgIcon>:
-                        <SvgIcon
-                        color="action"
-                        fontSize="medium"
-                      >
-                        <TrashIcon />
-                      </SvgIcon>
+                        </SvgIcon>
+                      :
+                      //   <SvgIcon
+                      //   color="action"
+                      //   fontSize="medium"
+                      // >
+                      //   <TrashIcon />
+                      // </SvgIcon>
+                      null
                       }
                         {/* <UserMinusIcon /> */}
                       </Button>
@@ -204,6 +247,16 @@ export const ComplaintsTable = (props) => {
         rowsPerPageOptions={[5, 10, 25]}
       />
     </Card>
+
+    {openViewComplaint && (
+      <ViewComplaint
+        openViewComplaint={openViewComplaint}
+        selectedComplaint={selectedComplaint}
+        handleCloseViewComplaint={handleCloseViewComplaint}
+        // handleRowsUpdate={handleRowsUpdate}
+      />
+    )}
+    </>
   );
 };
 

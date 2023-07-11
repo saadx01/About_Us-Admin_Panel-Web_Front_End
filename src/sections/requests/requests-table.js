@@ -221,6 +221,9 @@ export const RequestsTable = (props) => {
                   NGO
                 </TableCell>
                 <TableCell>
+                  Date
+                </TableCell>
+                <TableCell>
                   View Request Form
                 </TableCell>
                 {/* <TableCell>
@@ -251,6 +254,9 @@ export const RequestsTable = (props) => {
                           {ngoRequest.name}
                         </Typography>
                       {/* </Stack> */}
+                    </TableCell>
+                    <TableCell>
+                      {createdAt}
                     </TableCell>
                     <TableCell>
                       <Button
