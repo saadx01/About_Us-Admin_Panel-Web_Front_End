@@ -144,7 +144,8 @@ export const RequestsTable = (props) => {
       return <TableCell>
         Reject
       </TableCell>
-    else if(method === 'rejected' || method === 'active')
+    // else if(method === 'rejected' || method === 'active')
+    else if(method === 'rejected')
       return <TableCell>
         Delete
       </TableCell>
@@ -179,7 +180,8 @@ export const RequestsTable = (props) => {
           </SvgIcon>
         </Button>
       </TableCell>
-    else
+    // else
+    else if (method === 'rejected')
       return <TableCell>
       <Button
       onClick={() => handleDeleteRequest(selectedNgoRequestId)}>

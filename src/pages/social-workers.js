@@ -1,6 +1,6 @@
-import { useCallback, useMemo, useState, useEffect } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import Head from 'next/head';
-import { subDays, subHours } from 'date-fns';
+// import { subDays, subHours } from 'date-fns';
 import { Box, Button, Container, Stack, SvgIcon, Tab, Tabs, Typography } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
@@ -8,28 +8,42 @@ import { SocialWorkerTable } from 'src/sections/social-workers/social-worker-tab
 import { SocialWorkerSearch } from 'src/sections/social-workers/social-worker-search';
 import { applyPagination } from 'src/utils/apply-pagination';
 import axios from 'axios';
+import { API_URL } from "../../config/constants";
 
-const now = new Date();
+
+// const now = new Date();
 
 const Page = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [data, setData] = useState([]);
   const [method, setMethod] = useState('active');
+  const [rowsUpdate, setRowsUpdate] = React.useState(false);
 
-  useEffect(() => {
+
+
+  const getSocialWorkers = () => {
+    const token = window.localStorage.getItem('token');
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/api/v1/social-worker/');
+        const response = await axios.get(`${API_URL}admin/social-workers/`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+        });
         setData(response.data.socialWorkers);
-        console.log("Social workers request: ", response.data.socialWorkers)
+        // console.log("Social workers request: ", response.data.socialWorkers)
       } catch (error) {
         console.log(error);
       }
     };
 
     fetchData();
-  }, []);
+  }
+
+  useEffect(() => {
+    getSocialWorkers();
+  }, [rowsUpdate]);
 
   const useCustomers = useMemo(() => {
     return applyPagination(data, page, rowsPerPage);
@@ -86,6 +100,8 @@ const Page = () => {
               rowsPerPage={rowsPerPage}
               selected={customersSelection.selected}
               method={method}
+              rowsUpdate={rowsUpdate}
+              setRowsUpdate={setRowsUpdate}
             />
           </Stack>
         </Container>

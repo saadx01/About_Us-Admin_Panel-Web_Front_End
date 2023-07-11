@@ -20,6 +20,8 @@ import { Scrollbar } from 'src/components/scrollbar';
 import { getInitials } from 'src/utils/get-initials';
 import UserMinusIcon from '@heroicons/react/24/solid/UserMinusIcon';
 import UserPlusIcon from '@heroicons/react/24/solid/UserPlusIcon';
+import { API_URL } from "../../../config/constants";
+
 
 
 export const SocialWorkerTable = (props) => {
@@ -35,21 +37,67 @@ export const SocialWorkerTable = (props) => {
     page = 0,
     rowsPerPage = 0,
     selected = [],
-    method
+    method,
+    rowsUpdate,
+    setRowsUpdate
   } = props;
-  // console.log("Method: ",method)
 
-  const selectedSome = (selected.length > 0) && (selected.length < items.length);
-  const selectedAll = (items.length > 0) && (selected.length === items.length);
+  // const selectedSome = (selected.length > 0) && (selected.length < items.length);
+  // const selectedAll = (items.length > 0) && (selected.length === items.length);
   
-  const filterItems = (items) =>
-    {
+  const filterItems = (items) => {
       return items.filter((item) => item.status === method)
-  }
+  };
 
-  const filteredItems = filterItems(items)
-  // console.log("Items: ",items)
-  // console.log("filteredItems: ",filteredItems)
+  const filteredItems = filterItems(items);
+
+
+  const handleRemoveWorker = async (selectedWorkerId) => {
+    // console.log("ID got in func: ", selectedWorkerId);
+    const axios = require('axios');
+    const token = window.localStorage.getItem('token');
+    let config = {
+      method: 'delete',
+      maxBodyLength: Infinity,
+      url: `${API_URL}admin/social-workers/${selectedWorkerId}`,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    };
+  
+    try {
+      const response = await axios.request(config);
+      console.log(JSON.stringify(response.data));
+      setRowsUpdate(!rowsUpdate);
+      // console.log("RowsUpdate changed to: ", rowsUpdate);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  const handleReaddWorker = async (selectedWorkerId) => {
+    // console.log("ID got in func: ", selectedWorkerId);
+    const axios = require('axios');
+    const token = window.localStorage.getItem('token');
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: `${API_URL}admin/social-worker-re-add/${selectedWorkerId}`,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    };
+  
+    try {
+      const response = await axios.request(config);
+      console.log(JSON.stringify(response.data));
+      setRowsUpdate(!rowsUpdate);
+      // console.log("RowsUpdate changed to: ", rowsUpdate);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <Card>
@@ -58,19 +106,6 @@ export const SocialWorkerTable = (props) => {
           <Table>
             <TableHead>
               <TableRow>
-                {/* <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedAll}
-                    indeterminate={selectedSome}
-                    onChange={(event) => {
-                      if (event.target.checked) {
-                        onSelectAll?.();
-                      } else {
-                        onDeselectAll?.();
-                      }
-                    }}
-                  />
-                </TableCell> */}
                 <TableCell>
                   Name
                 </TableCell>
@@ -94,75 +129,65 @@ export const SocialWorkerTable = (props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredItems.map((customer) => {
-                const isSelected = selected.includes(customer.id);
-                // const createdAt = format(customer.createdAt, 'dd/MM/yyyy');
+              {filteredItems.map((worker) => {
+                const isSelected = selected.includes(worker.id);
+                // const createdAt = format(worker.createdAt, 'dd/MM/yyyy');
 
                 return (
                   <TableRow
                     hover
-                    key={customer._id}
+                    key={worker._id}
                     selected={isSelected}
                   >
-                    {/* <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={isSelected}
-                        onChange={(event) => {
-                          if (event.target.checked) {
-                            onSelectOne?.(customer.id);
-                          } else {
-                            onDeselectOne?.(customer.id);
-                          }
-                        }}
-                      />
-                    </TableCell> */}
                     <TableCell>
                       <Stack
                         alignItems="center"
                         direction="row"
                         spacing={2}
                       >
-                        <Avatar src={customer.avatar}>
-                          {getInitials(customer.name)}
+                        <Avatar src={worker.avatar}>
+                          {getInitials(worker.name)}
                         </Avatar>
                         <Typography variant="subtitle2">
-                          {customer.name}
+                          {worker.name}
                         </Typography>
                       </Stack>
                     </TableCell>
-                    {/* <TableCell>
-                      {customer.email}
-                    </TableCell> */}
+
                     <TableCell>
-                      {/* {customer.address.city}, {customer.address.state}, {customer.address.country} */}
-                      {customer.city}
+                      {worker.city}
                     </TableCell>
+
                     <TableCell>
-                      {/* {customer.phone} */}
-                      {customer.mobileNumber}
+                      {worker.mobileNumber}
                     </TableCell>
-                    {/* <TableCell>
-                      {createdAt}
-                    </TableCell> */}
+
                     <TableCell>
-                      <Button>
-                      {
-                        method === "active" ? 
-                        <SvgIcon
-                        color="action"
-                        fontSize="medium"
-                      >
-                        <UserMinusIcon />
-                      </SvgIcon>:
-                      <SvgIcon
-                      color="action"
-                      fontSize="medium"
-                    >
-                      <UserPlusIcon />
-                    </SvgIcon>
+                      {method === "active" ?
+                        <Button
+                        onClick={() =>
+                          handleRemoveWorker(worker._id)
+                        }>
+                          <SvgIcon
+                            color="action"
+                            fontSize="medium"
+                          >
+                            <UserMinusIcon />
+                          </SvgIcon>
+                        </Button>  
+                      :
+                        <Button
+                        onClick={() =>
+                          handleReaddWorker(worker._id)
+                        }>
+                          <SvgIcon
+                            color="action"
+                            fontSize="medium"
+                          >
+                            <UserPlusIcon />
+                          </SvgIcon>
+                        </Button>
                       }
-                        {/* <UserMinusIcon /> */}
-                      </Button>
                     </TableCell>
                   </TableRow>
                 );
