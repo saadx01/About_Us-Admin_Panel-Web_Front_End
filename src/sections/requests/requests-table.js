@@ -123,8 +123,8 @@ export const RequestsTable = (props) => {
 
 
 
-  const selectedSome = (selected.length > 0) && (selected.length < items.length);
-  const selectedAll = (items.length > 0) && (selected.length === items.length);
+  // const selectedSome = (selected.length > 0) && (selected.length < items.length);
+  // const selectedAll = (items.length > 0) && (selected.length === items.length);
   
   const filterItems = (items) => (items.filter((item) => item.status === method))
 

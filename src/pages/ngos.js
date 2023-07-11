@@ -96,9 +96,9 @@ const Page = () => {
               ))}
             </Grid>
 
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            {/* <Box sx={{ display: 'flex', justifyContent: 'center' }}>
               <Pagination count={3} size="small" />
-            </Box>
+            </Box> */}
           </Stack>
         </Container>
       </Box>

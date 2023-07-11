@@ -19,9 +19,14 @@ import axios from 'axios';
 
 const Page = () => {
 
-  const [overview, setOverview] = useState([]);
+  // const [overview, setOverview] = useState([]);
   // const [rowsUpdate, setRowsUpdate] = React.useState(false);
-
+  const [overview, setOverview] = useState({
+    ngoCount: 0,
+    socialWorkersCount: 0,
+    projectsCount: 0,
+    donation: 0
+  });
 
   const getOverview = () => {
     const token = window.localStorage.getItem('token');
@@ -86,7 +91,7 @@ const Page = () => {
               difference={16}
               positive={false}
               sx={{ height: '100%' }}
-              value={overview.socialWorkersCount}
+              value={overview.socialWorkersCount.toString()}
             />
           </Grid>
           <Grid
@@ -106,7 +111,7 @@ const Page = () => {
           >
             <OverviewDonation
               sx={{ height: '100%' }}
-              value={overview.donation}
+              value={overview.donation.toString()}
             />
           </Grid>
         </Grid> 
