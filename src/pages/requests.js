@@ -80,7 +80,8 @@ const Page = () => {
                 <Typography variant="h4">Requests</Typography>
               </Stack>
             </Stack>
-            <RequestsSearch />
+
+            {/* <RequestsSearch /> */}
 
             <Tabs onChange={handleMethodChange} sx={{ mb: 3 }} value={method}>
               <Tab label="Pending" value="pending" />

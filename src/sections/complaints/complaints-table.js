@@ -169,12 +169,12 @@ export const ComplaintsTable = (props) => {
                           {getInitials(complaint.name)}
                         </Avatar> */}
                         <Typography variant="subtitle2">
-                          {/* {complaint.project.name} */}
+                          {complaint.project.title}
                         </Typography>
                       {/* </Stack> */}
                     </TableCell>
                     <TableCell>
-                      {/* {complaint.project.ngo.name} */}
+                      {complaint.project.ngo.name}
                     </TableCell>
                     <TableCell>
                       {complaint.socialWorker.name}

@@ -76,7 +76,8 @@ const Page = () => {
                 <Typography variant="h4">NGOs</Typography>
               </Stack>
             </Stack>
-            <CompaniesSearch />
+
+            {/* <CompaniesSearch /> */}
 
             <Tabs onChange={handleMethodChange} sx={{ mb: 3 }} value={method}>
               <Tab label="Active" value="active" />
