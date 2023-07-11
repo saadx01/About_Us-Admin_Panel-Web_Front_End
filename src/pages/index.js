@@ -10,11 +10,44 @@ import { OverviewProjects } from 'src/sections/overview/overview-projects';
 import { OverviewTotalSocialWorkers } from 'src/sections/overview/overview-total-social-workers';
 import { OverviewDonation } from 'src/sections/overview/overview-donation';
 // import { OverviewTraffic } from 'src/sections/overview/overview-traffic';
+import { API_URL } from "../../config/constants";
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+
 
 // const now = new Date();
 
-const Page = () => (
-  <>
+const Page = () => {
+
+  const [overview, setOverview] = useState([]);
+  // const [rowsUpdate, setRowsUpdate] = React.useState(false);
+
+
+  const getOverview = () => {
+    const token = window.localStorage.getItem('token');
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${API_URL}admin/dashboard/`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+        });
+        setOverview(response.data.data);
+        // console.log("Overview Reponse: ", response)
+        // console.log("Overview: ", overview.data.data)
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  }
+
+  useEffect(() => {
+    getOverview();
+  }, []);
+
+  return (
+    <>
     <Head>
       <title>
         Overview | About Us
@@ -41,7 +74,7 @@ const Page = () => (
               difference={12}
               positive
               sx={{ height: '100%' }}
-              value="45"
+              value={overview.ngoCount}
             />
           </Grid>
           <Grid
@@ -53,7 +86,7 @@ const Page = () => (
               difference={16}
               positive={false}
               sx={{ height: '100%' }}
-              value="1.6k"
+              value={overview.socialWorkersCount}
             />
           </Grid>
           <Grid
@@ -63,7 +96,7 @@ const Page = () => (
           >
             <OverviewProjects
               sx={{ height: '100%' }}
-              value={75}
+              value={overview.projectsCount}
             />
           </Grid>
           <Grid
@@ -73,14 +106,16 @@ const Page = () => (
           >
             <OverviewDonation
               sx={{ height: '100%' }}
-              value="$15k"
+              value={overview.donation}
             />
           </Grid>
         </Grid> 
       </Container>
     </Box>
   </>
-);
+  );
+};
+
 
 Page.getLayout = (page) => (
   <DashboardLayout>
