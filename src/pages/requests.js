@@ -30,7 +30,7 @@ const Page = () => {
             Authorization: `Bearer ${token}`
           },
         });
-        console.log(response.data.ngos);
+        // console.log(response.data.ngos);
         setData(response.data.ngos);
       } catch (error) {
         console.log(error);

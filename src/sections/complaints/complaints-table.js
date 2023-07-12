@@ -47,7 +47,7 @@ export const ComplaintsTable = (props) => {
     setRowsUpdate
   } = props;
   // console.log("Items: ",items);
-  console.log("Method: ",method);
+  // console.log("Method: ",method);
 
   // const selectedSome = (selected.length > 0) && (selected.length < items.length);
   // const selectedAll = (items.length > 0) && (selected.length === items.length);
@@ -57,7 +57,7 @@ export const ComplaintsTable = (props) => {
   const filteredItems = filterItems(items)
 
   // console.log("Items: ",items)
-  console.log("filteredItems: ",filteredItems)
+  // console.log("filteredItems: ",filteredItems)
 
   const [selectedComplaint, setSelectedComplaint] = React.useState("");
   const [openViewComplaint, setOpenViewComplaint] = React.useState(false);

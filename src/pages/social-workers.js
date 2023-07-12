@@ -50,7 +50,7 @@ const Page = () => {
   };
 
   const filteredData = filterData(data);
-  console.log("Filtered Data: ", filteredData)
+  // console.log("Filtered Data: ", filteredData)
 
   const useData = useMemo(() => {
     return applyPagination(filteredData, page, rowsPerPage);

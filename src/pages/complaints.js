@@ -28,7 +28,7 @@ const Page = () => {
           },
         });
         // console.log("Response: ", response);
-        console.log("Response.data.data: ", response.data.complains);
+        // console.log("Response.data.data: ", response.data.complains);
         setData(response.data.complains);
         // console.log("Complaints: ", complaints)
       } catch (error) {
