@@ -25,6 +25,8 @@ import ChatBubbleBottomCenterTextIcon from '@heroicons/react/24/solid/ChatBubble
 import ViewComplaint from "./view-complaint";
 import React from 'react';
 import { API_URL } from "../../../config/constants";
+import SendEmailForm from "./send-email-form";
+
 
 
 export const ComplaintsTable = (props) => {
@@ -95,6 +97,15 @@ export const ComplaintsTable = (props) => {
     }
   };
 
+
+  const [selectedNgoEmail, setSelectedNgoEmail] = React.useState('');
+  const [openSendEmail, setOpenSendEmail] = React.useState(false);
+
+
+  const handleClickOpenSendEmail = (ngoEmail) => {
+    setOpenSendEmail(true);
+    setSelectedNgoEmail(ngoEmail)
+  };
 
   return (
     <>
@@ -169,15 +180,15 @@ export const ComplaintsTable = (props) => {
                           {getInitials(complaint.name)}
                         </Avatar> */}
                         <Typography variant="subtitle2">
-                          {complaint.project.title}
+                          {complaint.project && complaint.project.title || ""}
                         </Typography>
                       {/* </Stack> */}
                     </TableCell>
                     <TableCell>
-                      {complaint.project.ngo.name}
+                      {complaint.project && complaint.project.ngo && complaint.project.ngo.name || ""}
                     </TableCell>
                     <TableCell>
-                      {complaint.socialWorker.name}
+                      {complaint.socialWorker && complaint.socialWorker.name || ""}
                     </TableCell>
                     <TableCell>
                       {createdAt}
@@ -196,7 +207,9 @@ export const ComplaintsTable = (props) => {
                       </Button>
                     </TableCell>
                     <TableCell>
-                      <Button>
+                      <Button
+                      onClick={() => 
+                        handleClickOpenSendEmail(complaint.project.ngo.email)}>
                       <SvgIcon
                           color="action"
                           fontSize="medium"
@@ -256,6 +269,14 @@ export const ComplaintsTable = (props) => {
         // handleRowsUpdate={handleRowsUpdate}
       />
     )}
+
+    {openSendEmail && (
+        <SendEmailForm
+          openSendEmail={openSendEmail}
+          setOpenSendEmail={setOpenSendEmail}
+          selectedNgoEmail={selectedNgoEmail}
+        />
+      )}
     </>
   );
 };
